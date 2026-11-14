@@ -23,7 +23,7 @@
 }
 
 *{box-sizing:border-box}
-html,body{min-height:100%}
+html,body{min-height:100%;overflow-x:hidden}
 body{
   margin:0;
   font-family:'Poppins',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
@@ -58,38 +58,45 @@ main{
   padding:6px max(14px,env(safe-area-inset-left,0px)) 130px;
   padding-right:max(14px,env(safe-area-inset-right,0px));
 }
-.grid{
-  display:grid;gap:14px;align-items:start;
-  grid-template-columns:repeat(2,minmax(0,1fr));   /* celular: 2 por linha */
-}
-@media(min-width:600px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
-@media(min-width:800px){ .grid{grid-template-columns:repeat(4,minmax(0,1fr))} }
-@media(min-width:1000px){ .grid{grid-template-columns:repeat(5,minmax(0,1fr))} }
+/* MOBILE (base): um produto abaixo do outro, card horizontal (foto + info) */
+.grid{display:flex;flex-direction:column;gap:12px}
 .card{
   background:var(--card);border-radius:var(--radius);
-  overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-sm);
+  overflow:hidden;display:flex;flex-direction:row;box-shadow:var(--shadow-sm);
   transition:transform .18s ease, box-shadow .18s ease;
 }
-.card:active{transform:scale(.99)}
-@media (hover:hover){.card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}}
+.card:active{transform:scale(.995)}
+@media (hover:hover){.card:hover{box-shadow:var(--shadow)}}
 .card .photo{
-  aspect-ratio:1/1;background:var(--card);display:flex;align-items:center;justify-content:center;
+  flex:0 0 40%;max-width:150px;aspect-ratio:1/1;background:var(--card);
+  display:flex;align-items:center;justify-content:center;
 }
 .card .photo img{width:100%;height:100%;object-fit:contain;padding:8px;max-width:100%}
-.card .body{padding:12px 13px 13px;display:flex;flex-direction:column;gap:7px}
+.card .body{padding:12px 14px;display:flex;flex-direction:column;gap:6px;justify-content:center;flex:1;min-width:0}
 .card h3{font-family:'Poppins',sans-serif;font-weight:600;font-size:.96rem;line-height:1.22;color:var(--ink)}
 .card .desc{font-size:.76rem;color:var(--ink-soft);line-height:1.4}
 .card .price{font-weight:700;color:var(--pink-ink);font-size:1.1rem;font-variant-numeric:tabular-nums}
 .card button.add{
-  margin-top:4px;border:none;cursor:pointer;
-  background:var(--pink);color:#fff;font-weight:600;font-size:.86rem;font-family:inherit;
-  padding:11px 10px;border-radius:999px;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  transition:background .15s, transform .1s;min-height:42px;
+  margin-top:6px;border:none;cursor:pointer;align-self:flex-start;
+  background:var(--pink);color:#fff;font-weight:600;font-size:.88rem;font-family:inherit;
+  padding:10px 20px;border-radius:999px;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  transition:background .15s, transform .1s;min-height:40px;
 }
 @media (hover:hover){.card button.add:hover{background:var(--pink-ink)}}
 .card button.add:active{transform:scale(.96)}
 .card button.add.in-cart{background:var(--pink-soft);color:var(--pink-ink)}
+
+/* TABLET / DESKTOP: grade de cards verticais */
+@media(min-width:620px){
+  .grid{display:grid;gap:16px;align-items:start;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .card{flex-direction:column}
+  .card .photo{flex:none;max-width:none;width:100%}
+  .card .body{justify-content:flex-start}
+  .card button.add{align-self:stretch;padding:11px 14px}
+}
+@media(min-width:900px){ .grid{grid-template-columns:repeat(4,minmax(0,1fr))} }
+@media(min-width:1140px){ .grid{grid-template-columns:repeat(5,minmax(0,1fr))} }
 
 /* ---------- BOTÃO FLUTUANTE DO CARRINHO ---------- */
 .cart-fab{
@@ -114,12 +121,13 @@ main{
   opacity:0;pointer-events:none;transition:opacity .25s;
 }
 .overlay.open{opacity:1;pointer-events:auto}
+.drawer-shell{position:fixed;inset:0;z-index:50;overflow:hidden;pointer-events:none}
 .drawer{
-  position:fixed;top:0;right:0;z-index:50;height:100%;
+  position:absolute;top:0;right:0;height:100%;
   width:min(430px,100%);background:var(--nude);
   box-shadow:-10px 0 40px rgba(93,58,75,.22);
   transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
-  display:flex;flex-direction:column;
+  display:flex;flex-direction:column;pointer-events:auto;
   padding-right:env(safe-area-inset-right,0px);
 }
 .drawer.open{transform:translateX(0)}
@@ -206,6 +214,7 @@ footer{text-align:center;color:var(--ink-soft);font-size:.76rem;padding:4px 16px
 
 <div class="overlay" id="overlay"></div>
 
+<div class="drawer-shell">
 <aside class="drawer" id="drawer" aria-label="Seu carrinho">
   <div class="dhead">
     <h2>Seu carrinho</h2>
@@ -238,6 +247,7 @@ footer{text-align:center;color:var(--ink-soft);font-size:.76rem;padding:4px 16px
     <p class="hint" id="hint">O pagamento é combinado com a vendedora pelo WhatsApp 💕</p>
   </div>
 </aside>
+</div>
 
 <footer>Blow Girl · Catálogo de revenda</footer>
 
