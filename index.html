@@ -71,9 +71,11 @@ main{
   display:flex;flex-direction:column;box-shadow:var(--shadow-sm);
 }
 /* ---------- CARROSSEL DE FOTOS (arrastar pro lado) ---------- */
-.card .photo{position:relative;width:100%;aspect-ratio:1/1;background:var(--card)}
+/* área da foto SEMPRE quadrada (1:1); foto vertical ou horizontal se encaixa dentro dela */
+.card .photo{position:relative;width:100%;aspect-ratio:1/1;overflow:hidden;background:var(--card)}
 .track{
-  display:flex;height:100%;overflow-x:auto;overflow-y:hidden;
+  position:absolute;inset:0;
+  display:flex;overflow-x:auto;overflow-y:hidden;
   scroll-snap-type:x mandatory;scroll-behavior:smooth;
   overscroll-behavior-x:contain;scrollbar-width:none;
 }
