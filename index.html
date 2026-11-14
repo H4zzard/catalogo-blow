@@ -70,11 +70,56 @@ main{
   background:var(--card);border-radius:22px;overflow:hidden;
   display:flex;flex-direction:column;box-shadow:var(--shadow-sm);
 }
-.card .photo{width:100%;aspect-ratio:1/1;background:var(--card)}
-.card .photo img{width:100%;height:100%;object-fit:contain;padding:14px}
+/* ---------- CARROSSEL DE FOTOS (arrastar pro lado) ---------- */
+.card .photo{position:relative;width:100%;aspect-ratio:1/1;background:var(--card)}
+.track{
+  display:flex;height:100%;overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;scroll-behavior:smooth;
+  overscroll-behavior-x:contain;scrollbar-width:none;
+}
+.track::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;height:100%;scroll-snap-align:center;scroll-snap-stop:always}
+.slide img{width:100%;height:100%;object-fit:contain;padding:14px}
+.dots{
+  position:absolute;left:0;right:0;bottom:10px;
+  display:flex;justify-content:center;gap:6px;pointer-events:none;
+}
+.dot{width:8px;height:8px;border-radius:999px;background:var(--pink-soft);transition:width .2s, background .2s}
+.dot.on{width:22px;background:var(--pink)}
+.nav{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:40px;height:40px;border-radius:999px;border:none;cursor:pointer;
+  background:rgba(255,255,255,.92);color:var(--pink-ink);box-shadow:var(--shadow-sm);
+  font-size:24px;font-weight:700;line-height:1;
+  display:flex;align-items:center;justify-content:center;transition:opacity .2s;
+}
+.nav.prev{left:8px}
+.nav.next{right:8px}
+.nav:disabled{opacity:0;pointer-events:none}
+
+/* ---------- TEXTO DO CARD (mesma altura em todos) ---------- */
 .card .body{padding:4px 18px 18px;display:flex;flex-direction:column;gap:8px}
-.card h3{margin:0;font-weight:700;font-size:21px;line-height:1.25;color:var(--ink)}
-.card .desc{margin:0;font-size:15px;color:var(--ink-soft);line-height:1.45}
+.card .txt{
+  /* altura fixa = 2 linhas de nome + 2 linhas de descrição → todos os cards iguais */
+  height:calc(2 * 21px * 1.25 + 8px + 2 * 15px * 1.45);
+  display:flex;flex-direction:column;gap:8px;overflow:hidden;
+}
+.card h3{
+  margin:0;font-weight:700;font-size:21px;line-height:1.25;color:var(--ink);
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;
+}
+.card .desc{
+  margin:0;font-size:15px;color:var(--ink-soft);line-height:1.45;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;
+}
+.card .more{
+  align-self:flex-start;margin-top:-4px;padding:2px 0;border:none;background:none;cursor:pointer;
+  font-family:inherit;font-size:14px;font-weight:600;color:var(--pink-ink);text-decoration:underline;
+}
+.card .more.off{visibility:hidden}
+/* "Ver mais" aberto: mostra tudo */
+.card.open .txt{height:auto}
+.card.open h3,.card.open .desc{-webkit-line-clamp:unset;line-clamp:none;display:block}
 .card .price{font-weight:800;color:var(--pink-ink);font-size:26px;font-variant-numeric:tabular-nums}
 .card button.add{
   margin-top:4px;border:none;cursor:pointer;width:100%;
@@ -261,86 +306,119 @@ main{
 // 📱 NÚMERO DE WHATSAPP (só números, com 55 + DDD).
 const WHATSAPP = "5581998360659";
 
-// 🏷️ PRODUTOS — para alterar: mude nome, descricao, preco ou foto.
+// 🏷️ PRODUTOS — para alterar: mude nome, descricao, preco ou fotos.
 //    Para ADICIONAR: copie um bloco { ... } e cole na lista.
-//    Para REMOVER: apague o bloco. A "foto" é o nome do arquivo de imagem.
+//    Para REMOVER: apague o bloco.
+//    📸 "fotos": lista de imagens do carrossel, NA ORDEM em que aparecem.
+//       A 1ª foto é a capa do card e a miniatura no carrinho.
+//       Com uma foto só, fica imagem fixa: fotos: ["arquivo.webp"]
 const PRODUTOS = [
   {
     id: "kit-skincare",
     nome: "Kit Skincare Banho",
     descricao: "Hidratante corporal beijável + esfoliante corporal + sabonete líquido.",
     preco: 104.90,
-    foto: "kit-skincare.webp"
+    fotos: ["kit-skincare.webp"]
   },
   {
     id: "kit-rotina-completa",
     nome: "Kit Blow Girl Rotina Completa",
     descricao: "Hidratante corporal + sabonete corporal + sabonete íntimo + perfume.",
     preco: 129.90,
-    foto: "kit-blow-girl-rotina-completa.webp"
+    fotos: ["kit-blow-girl-rotina-completa.webp"]
   },
   {
     id: "hidratante-corporal",
     nome: "Hidratante Corporal",
     descricao: "Hidratação diária com toque suave e perfume marcante.",
     preco: 35.90,
-    foto: "hidratante-corporal.webp"
+    fotos: ["hidratante-corporal.webp"]
   },
   {
     id: "hidratante-iluminador",
     nome: "Hidratante Iluminador",
-    descricao: "Hidrata e dá um brilho iluminado à pele.",
+    descricao: "Blow Girl Hidratante Corporal Iluminador Bifásico – Baunilha com Glitter Hidratante corporal bifásico (gel + creme) que combina cuidado, hidratação e luminosidade. Com fragrância de baunilha e partículas de glitter, deixa a pele macia, perfumada e com um lindo efeito iluminado.",
     preco: 39.90,
-    foto: "hidratante-iluminador-corporal.webp"
+    fotos: [
+      "hidratante-iluminador/1.webp",
+      "hidratante-iluminador/2.jpg",
+      "hidratante-iluminador/3.jpg",
+      "hidratante-iluminador/4.jpg",
+      "hidratante-iluminador/5.jpg"
+    ]
   },
   {
     id: "esfoliante-corporal",
     nome: "Esfoliante Corporal",
-    descricao: "Esfoliação suave que renova e deixa a pele macia.",
+    descricao: "Esfoliante Corporal em Gel Blow Girl – 525g | Morango, Rocha Vulcânica e Glitter Esfoliante corporal com textura em gel e fragrância de morango, desenvolvido para promover a esfoliação da pele, removendo células mortas e impurezas. Com partículas de rocha vulcânica riolita, auxilia na renovação da superfície da pele, deixando-a mais macia, suave e com toque iluminado. Ideal para áreas como virilha e axilas.",
     preco: 54.90,
-    foto: "esfoliante-corporal.webp"
+    fotos: [
+      "esfoliante-morango/1.webp",
+      "esfoliante-morango/2.jpg",
+      "esfoliante-morango/3.jpg",
+      "esfoliante-morango/4.jpg",
+      "esfoliante-morango/5.jpg"
+    ]
   },
   {
     id: "body-splash",
     nome: "Body Splash Morango Fine 180ml",
     descricao: "Perfume corporal leve e refrescante para usar no dia a dia.",
     preco: 33.90,   // <-- coloque o preço
-    foto: "body-splash-morango-fine-180ml.webp"
+    fotos: ["body-splash-morango-fine-180ml.webp"]
   },
   {
     id: "creme-clareador",
     nome: "Creme Clareador Corporal",
-    descricao: "Ajuda a uniformizar o tom da pele e deixa a pele macia.",
+    descricao: "Creme Clareador Multiáreas Blow Girl – 90g | Com Aloe Vera Desenvolvido para o cuidado de áreas como axilas, virilha, coxas e mãos. Sua fórmula com Aloe Vera auxilia na hidratação e no cuidado da pele, ajudando a melhorar a aparência de manchas e a promover uma pele com aspecto mais uniforme e saudável.",
     preco: 39.90,   // <-- coloque o preço
-    foto: "creme-clareador-corporal.webp"
+    fotos: [
+      "creme-clareador/1.webp",
+      "creme-clareador/2.jpg",
+      "creme-clareador/3.jpg"
+    ]
   },
   {
     id: "perfume-blow",
     nome: "Perfume Blow Girl 30ml",
     descricao: "A fragrância Blow Girl em tamanho prático para levar na bolsa.",
     preco: 34.90,   // <-- coloque o preço
-    foto: "perfume-blow-girl-30ml.webp"
+    fotos: ["perfume-blow-girl-30ml.webp"]
   },
   {
     id: "sabonete-liquido",
     nome: "Sabonete Líquido Morango com Creme",
-    descricao: "Limpa com suavidade e deixa a pele perfumada.",
+    descricao: "Sabonete Líquido Corporal Blow Girl – 200ml | Morango, Fine e Karité Proporciona uma limpeza suave e agradável, deixando a pele com uma deliciosa fragrância de morango. Enriquecido com ingredientes como karité, ajuda a manter a pele macia, hidratada e perfumada após o banho. Ideal para transformar sua rotina de cuidados em um momento especial.",
     preco: 32.90,   // <-- coloque o preço
-    foto: "sabonete-liquido-blow-girl-com-morango-creme.webp"
+    fotos: [
+      "sabonete-liquido/1.webp",
+      "sabonete-liquido/2.jpg",
+      "sabonete-liquido/3.jpg",
+      "sabonete-liquido/4.jpg",
+      "sabonete-liquido/5.jpg",
+      "sabonete-liquido/6.jpg"
+    ]
   },
   {
     id: "espuma-limpeza-facial",
     nome: "Espuma de Limpeza Facial Morango 150ml",
-    descricao: "Limpeza suave para o rosto, com massageador no aplicador.",
+    descricao: "Mousse de Limpeza Facial Blow Girl – 150ml | Niacinamida e Biossacarídeos Espuma de limpeza facial que remove impurezas e resíduos, proporcionando uma sensação de pele limpa, fresca e macia. Enriquecida com niacinamida e biossacarídeos, auxilia no cuidado diário da pele, deixando-a com aspecto saudável e revitalizado.",
     preco: 34.90,   // <-- coloque o preço
-    foto: "espuma-limpeza-facial-massageador-morango-150ml.webp"
+    fotos: [
+      "limpeza-facial/1.webp",
+      "limpeza-facial/2.jpg"
+    ]
   },
   {
     id: "serum-facial",
     nome: "Sérum Facial Hidratante 35ml",
-    descricao: "Com ácido hialurônico e niacinamida. Para todo tipo de pele, dia e noite.",
+    descricao: "Sérum Facial Hidratante Blow Girl – 35ml | Niacinamida e Vitamina B3 Sérum facial desenvolvido para hidratar e cuidar da pele diariamente. Enriquecido com niacinamida (vitamina B3), auxilia na uniformização do tom e na melhora da aparência da pele, proporcionando um aspecto mais saudável, hidratado e luminoso.",
     preco: 32.90,   // <-- coloque o preço
-    foto: "serum-facial-hidratante-acido-hialuronico-niacinamida-35ml-todo-tipo-de-pele-dia-noite.webp"
+    fotos: [
+      "serum-facial/1.webp",
+      "serum-facial/2.jpg",
+      "serum-facial/3.jpg"
+    ]
   }
 ];
 
@@ -359,19 +437,74 @@ const totalItems = () => Object.values(cart).reduce((a,b)=>a+b,0);
 const totalPrice = () => Object.entries(cart).reduce((s,[id,q])=>s+(byId[id]?byId[id].preco*q:0),0);
 const entries = () => Object.entries(cart).filter(([id,q])=>q>0 && byId[id]);
 
+function carousel(p){
+  const fotos = p.fotos;
+  const slides = fotos.map((f,i)=>`
+    <div class="slide"><img src="${f}" alt="${p.nome} – foto ${i+1}" ${i>0?'loading="lazy"':''}></div>`).join('');
+  if(fotos.length<2) return `<div class="photo"><div class="track">${slides}</div></div>`;
+  return `<div class="photo">
+      <div class="track">${slides}</div>
+      <button class="nav prev" aria-label="Foto anterior" disabled>‹</button>
+      <button class="nav next" aria-label="Próxima foto">›</button>
+      <div class="dots">${fotos.map((_,i)=>`<span class="dot${i===0?' on':''}"></span>`).join('')}</div>
+    </div>`;
+}
+
 function renderGrid(){
   $('grid').innerHTML = PRODUTOS.map(p=>`
-    <article class="card">
-      <div class="photo"><img src="${p.foto}" alt="${p.nome}" loading="lazy"></div>
+    <article class="card" data-id="${p.id}">
+      ${carousel(p)}
       <div class="body">
-        <h3>${p.nome}</h3>
-        <p class="desc">${p.descricao}</p>
+        <div class="txt">
+          <h3>${p.nome}</h3>
+          <p class="desc">${p.descricao}</p>
+        </div>
+        <button class="more off" type="button">Ver mais</button>
         <span class="price">${brl(p.preco)}</span>
-        <button class="add${cart[p.id]?' in-cart':''}" data-id="${p.id}">
-          ${cart[p.id] ? '✓ No carrinho ('+cart[p.id]+')' : '+ Adicionar'}
-        </button>
+        <button class="add" data-id="${p.id}"></button>
       </div>
     </article>`).join('');
+
+  // carrossel: atualiza bolinhas e setas conforme a foto visível
+  document.querySelectorAll('.card .photo').forEach(photo=>{
+    const track = photo.querySelector('.track');
+    const dots = photo.querySelectorAll('.dot');
+    if(!dots.length) return;
+    const prev = photo.querySelector('.prev'), next = photo.querySelector('.next');
+    track.addEventListener('scroll',()=>{
+      const i = Math.round(track.scrollLeft / track.clientWidth);
+      dots.forEach((d,k)=>d.classList.toggle('on',k===i));
+      prev.disabled = i<=0;
+      next.disabled = i>=dots.length-1;
+    },{passive:true});
+  });
+
+  renderButtons();
+  fitText();
+}
+
+// deixa todos os cards com a mesma altura de texto:
+// nome com 1 linha → descrição mostra 3 linhas; nome com 2 linhas → descrição mostra 2
+function fitText(){
+  document.querySelectorAll('.card').forEach(card=>{
+    if(card.classList.contains('open')) return;
+    const h3 = card.querySelector('h3'), desc = card.querySelector('.desc'), more = card.querySelector('.more');
+    const lh = parseFloat(getComputedStyle(h3).lineHeight);
+    const titleLines = Math.round(h3.getBoundingClientRect().height / lh);
+    const n = titleLines>=2 ? 2 : 3;
+    desc.style.webkitLineClamp = n;
+    desc.style.lineClamp = n;
+    more.classList.toggle('off', desc.scrollHeight <= desc.clientHeight + 2 && h3.scrollHeight <= h3.clientHeight + 2);
+  });
+}
+
+// atualiza só os botões "Adicionar" (sem redesenhar os cards → carrossel não volta pra 1ª foto)
+function renderButtons(){
+  document.querySelectorAll('button.add').forEach(b=>{
+    const q = cart[b.dataset.id];
+    b.classList.toggle('in-cart', !!q);
+    b.textContent = q ? `✓ No carrinho (${q})` : '+ Adicionar';
+  });
 }
 
 function renderCart(){
@@ -389,7 +522,7 @@ function renderCart(){
   $('items').innerHTML = list.map(([id,q])=>{
     const p = byId[id];
     return `<div class="item">
-      <div class="thumb"><img src="${p.foto}" alt="${p.nome}"></div>
+      <div class="thumb"><img src="${p.fotos[0]}" alt="${p.nome}"></div>
       <div class="info">
         <div class="nm">${p.nome}</div>
         <div class="pr">${brl(p.preco*q)}</div>
@@ -406,7 +539,7 @@ function renderCart(){
   }).join('');
 }
 
-function refresh(){ saveCart(); renderGrid(); renderCart(); }
+function refresh(){ saveCart(); renderButtons(); renderCart(); }
 
 function addToCart(id){
   cart[id] = (cart[id]||0) + 1;
@@ -421,9 +554,30 @@ $('cartFab').addEventListener('click',openCart);
 $('closeBtn').addEventListener('click',closeCart);
 
 $('grid').addEventListener('click',e=>{
-  const b = e.target.closest('button.add');
-  if(b) addToCart(b.dataset.id);
+  const add = e.target.closest('button.add');
+  if(add) return addToCart(add.dataset.id);
+
+  const nav = e.target.closest('.nav');
+  if(nav){
+    const track = nav.parentElement.querySelector('.track');
+    track.scrollBy({left:(nav.classList.contains('next')?1:-1)*track.clientWidth});
+    return;
+  }
+
+  const more = e.target.closest('.more');
+  if(more){
+    const card = more.closest('.card');
+    const open = card.classList.toggle('open');
+    more.textContent = open ? 'Ver menos' : 'Ver mais';
+    const desc = card.querySelector('.desc');
+    if(open){ desc.style.webkitLineClamp = ''; desc.style.lineClamp = ''; }
+    else fitText();
+  }
 });
+
+// recalcula a altura dos textos quando a fonte carrega ou a tela gira
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitText);
+window.addEventListener('resize',fitText);
 
 $('items').addEventListener('click',e=>{
   const inc=e.target.closest('[data-inc]'), dec=e.target.closest('[data-dec]'), rm=e.target.closest('[data-rm]');
