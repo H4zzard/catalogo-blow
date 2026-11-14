@@ -1,0 +1,416 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Blow Girl Catálogo</title>
+<style>
+/* ============================================================
+   PALETA — nude + rosa da logo + branco
+   Layout: catálogo em grade (2 col no celular) + carrinho em gaveta
+   ============================================================ */
+:root{
+  --nude:#f8efe7;         /* fundo nude da página */
+  --nude-2:#f2e4d9;       /* nude um pouco mais fechado */
+  --card:#ffffff;         /* branco dos cards = branco das fotos */
+  --pink:#f163a2;         /* rosa da logo (claro, vivo) */
+  --pink-ink:#ed5296;     /* rosa p/ hover (ainda claro) */
+  --pink-soft:#fcdcec;    /* rosa bem suave */
+  --pink-tint:#fdeef6;    /* quase branco rosado */
+  --ink:#5d3a4b;          /* texto principal (mauve suave) */
+  --ink-soft:#9c7e8c;     /* texto secundário */
+  --line:#efe0d6;         /* linhas/bordas (tom nude) */
+  --shadow:0 12px 30px rgba(180,120,150,.18);
+  --shadow-sm:0 6px 16px rgba(180,120,150,.12);
+  --radius:22px;
+  color-scheme:light;     /* design comprometido com o visual claro da marca */
+}
+
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{
+  margin:0;
+  font-family:'Poppins',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:
+    radial-gradient(900px 440px at 50% -8%, var(--pink-soft), transparent 62%),
+    linear-gradient(180deg, var(--nude) 0%, var(--nude-2) 100%);
+  background-attachment:fixed;
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:'Pacifico',cursive;font-weight:400;margin:0}
+
+/* ---------- CABEÇALHO ---------- */
+header{
+  text-align:center;
+  padding:26px max(16px,env(safe-area-inset-left,0px)) 14px;
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+header .logo-wrap{
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--card);border-radius:50%;
+  width:132px;height:132px;box-shadow:var(--shadow);
+}
+header img.logo{width:104px;max-width:78%;height:auto}
+header p.tag{
+  margin:14px auto 0;color:var(--ink-soft);font-size:.9rem;letter-spacing:.4px;max-width:320px;line-height:1.5;
+}
+
+/* ---------- GRADE DE PRODUTOS ---------- */
+main{
+  max-width:980px;margin:0 auto;
+  padding:6px max(14px,env(safe-area-inset-left,0px)) 130px;
+  padding-right:max(14px,env(safe-area-inset-right,0px));
+}
+.grid{
+  display:grid;gap:14px;align-items:start;
+  grid-template-columns:repeat(2,minmax(0,1fr));   /* celular: 2 por linha */
+}
+@media(min-width:600px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
+@media(min-width:800px){ .grid{grid-template-columns:repeat(4,minmax(0,1fr))} }
+@media(min-width:1000px){ .grid{grid-template-columns:repeat(5,minmax(0,1fr))} }
+.card{
+  background:var(--card);border-radius:var(--radius);
+  overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-sm);
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.card:active{transform:scale(.99)}
+@media (hover:hover){.card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}}
+.card .photo{
+  aspect-ratio:1/1;background:var(--card);display:flex;align-items:center;justify-content:center;
+}
+.card .photo img{width:100%;height:100%;object-fit:contain;padding:8px;max-width:100%}
+.card .body{padding:12px 13px 13px;display:flex;flex-direction:column;gap:7px}
+.card h3{font-family:'Poppins',sans-serif;font-weight:600;font-size:.96rem;line-height:1.22;color:var(--ink)}
+.card .desc{font-size:.76rem;color:var(--ink-soft);line-height:1.4}
+.card .price{font-weight:700;color:var(--pink-ink);font-size:1.1rem;font-variant-numeric:tabular-nums}
+.card button.add{
+  margin-top:4px;border:none;cursor:pointer;
+  background:var(--pink);color:#fff;font-weight:600;font-size:.86rem;font-family:inherit;
+  padding:11px 10px;border-radius:999px;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:background .15s, transform .1s;min-height:42px;
+}
+@media (hover:hover){.card button.add:hover{background:var(--pink-ink)}}
+.card button.add:active{transform:scale(.96)}
+.card button.add.in-cart{background:var(--pink-soft);color:var(--pink-ink)}
+
+/* ---------- BOTÃO FLUTUANTE DO CARRINHO ---------- */
+.cart-fab{
+  position:fixed;z-index:30;
+  left:50%;transform:translateX(-50%);
+  bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  background:var(--pink);color:#fff;border:none;cursor:pointer;
+  padding:14px 26px;border-radius:999px;box-shadow:var(--shadow);
+  display:flex;align-items:center;gap:10px;font-family:inherit;font-weight:700;font-size:1rem;
+  transition:transform .12s, background .15s;
+}
+.cart-fab:active{transform:translateX(-50%) scale(.96)}
+.cart-fab .count{
+  background:#fff;color:var(--pink-ink);min-width:24px;height:24px;border-radius:999px;
+  display:inline-flex;align-items:center;justify-content:center;font-size:.82rem;padding:0 6px;font-weight:700;
+}
+.cart-fab[hidden]{display:none}
+
+/* ---------- GAVETA DO CARRINHO ---------- */
+.overlay{
+  position:fixed;inset:0;background:rgba(93,58,75,.4);z-index:40;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.overlay.open{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;right:0;z-index:50;height:100%;
+  width:min(430px,100%);background:var(--nude);
+  box-shadow:-10px 0 40px rgba(93,58,75,.22);
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+  padding-right:env(safe-area-inset-right,0px);
+}
+.drawer.open{transform:translateX(0)}
+.drawer .dhead{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px 14px;border-bottom:1px solid var(--line);
+  padding-top:calc(18px + env(safe-area-inset-top,0px));background:var(--card);
+}
+.drawer .dhead h2{font-size:1.45rem;color:var(--pink-ink)}
+.drawer .close{background:none;border:none;font-size:1.7rem;cursor:pointer;color:var(--ink-soft);line-height:1;padding:4px 8px}
+.drawer .ditems{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
+
+.empty{text-align:center;color:var(--ink-soft);padding:48px 10px;font-size:.95rem;line-height:1.5}
+.empty .big{font-size:2.4rem;display:block;margin-bottom:12px}
+
+.item{
+  display:flex;gap:11px;background:var(--card);
+  border-radius:16px;padding:9px;align-items:center;box-shadow:var(--shadow-sm);
+}
+.item .thumb{width:54px;height:54px;border-radius:12px;background:var(--card);flex:0 0 auto;overflow:hidden;border:1px solid var(--line)}
+.item .thumb img{width:100%;height:100%;object-fit:contain;padding:3px}
+.item .info{flex:1;min-width:0}
+.item .info .nm{font-weight:600;font-size:.86rem;line-height:1.2;color:var(--ink)}
+.item .info .pr{color:var(--pink-ink);font-weight:700;font-size:.86rem;font-variant-numeric:tabular-nums;margin-top:2px}
+.item .qty{display:flex;align-items:center;gap:6px}
+.item .qty button{
+  width:30px;height:30px;border-radius:999px;border:1px solid var(--line);background:var(--nude);
+  color:var(--pink-ink);font-size:1.15rem;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;
+}
+.item .qty span{min-width:18px;text-align:center;font-weight:600;font-variant-numeric:tabular-nums;font-size:.92rem}
+.item .rm{background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:1.1rem;padding:2px 2px}
+
+/* ---------- RODAPÉ DO CARRINHO / CHECKOUT ---------- */
+.dfoot{border-top:1px solid var(--line);padding:15px 18px calc(16px + env(safe-area-inset-bottom,0px));background:var(--card);display:flex;flex-direction:column;gap:11px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:.78rem;font-weight:600;color:var(--ink-soft);letter-spacing:.2px}
+.field input,.field textarea{
+  font-family:inherit;font-size:16px;padding:11px 13px;border-radius:12px;
+  border:1px solid var(--line);background:var(--nude);color:var(--ink);width:100%;
+}
+.field textarea{resize:vertical;min-height:44px}
+.field input:focus,.field textarea:focus{outline:2px solid var(--pink);outline-offset:1px;background:var(--pink-tint)}
+.pays{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pays label{
+  display:flex;align-items:center;gap:8px;cursor:pointer;
+  border:1px solid var(--line);background:var(--nude);border-radius:12px;padding:10px 12px;
+  font-size:.88rem;font-weight:500;color:var(--ink);transition:.15s;
+}
+.pays label:has(input:checked){border-color:var(--pink);background:var(--pink-soft);color:var(--pink-ink);font-weight:600}
+.pays input{accent-color:var(--pink-ink);width:16px;height:16px}
+.totrow{display:flex;justify-content:space-between;align-items:baseline;padding-top:2px}
+.totrow .lbl{color:var(--ink-soft);font-size:.92rem}
+.totrow .val{font-weight:800;color:var(--pink-ink);font-size:1.5rem;font-variant-numeric:tabular-nums}
+.checkout{
+  border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:1.05rem;color:#fff;
+  background:var(--pink);
+  padding:15px;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:9px;
+  box-shadow:0 8px 20px rgba(241,99,162,.35);transition:background .15s, transform .1s;
+}
+@media (hover:hover){.checkout:hover{background:var(--pink-ink)}}
+.checkout:active{transform:scale(.98)}
+.checkout:disabled{opacity:.45;cursor:not-allowed}
+.hint{font-size:.72rem;color:var(--ink-soft);text-align:center;line-height:1.45}
+
+footer{text-align:center;color:var(--ink-soft);font-size:.76rem;padding:4px 16px 26px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;500;600;700;800&display=swap">
+
+<header>
+  <div class="logo-wrap"><img class="logo" src="logo-blow.webp" alt="Blow Girl"></div>
+  <p class="tag">✨ Beleza e autocuidado · Revenda oficial ✨</p>
+</header>
+
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+
+<button class="cart-fab" id="cartFab" hidden aria-label="Abrir carrinho">
+  🛍️ Ver carrinho <span class="count" id="fabCount">0</span>
+</button>
+
+<div class="overlay" id="overlay"></div>
+
+<aside class="drawer" id="drawer" aria-label="Seu carrinho">
+  <div class="dhead">
+    <h2>Seu carrinho</h2>
+    <button class="close" id="closeBtn" aria-label="Fechar">×</button>
+  </div>
+  <div class="ditems" id="ditems"></div>
+  <div class="dfoot" id="dfoot">
+    <div class="field">
+      <label for="nome">Seu nome</label>
+      <input id="nome" type="text" placeholder="Digite seu nome" autocomplete="name">
+    </div>
+    <div class="field">
+      <label>Forma de pagamento</label>
+      <div class="pays" id="pays">
+        <label><input type="radio" name="pay" value="Pix"> Pix</label>
+        <label><input type="radio" name="pay" value="Cartão de crédito"> Crédito</label>
+        <label><input type="radio" name="pay" value="Cartão de débito"> Débito</label>
+        <label><input type="radio" name="pay" value="Dinheiro"> Dinheiro</label>
+      </div>
+    </div>
+    <div class="field">
+      <label for="obs">Observações (opcional)</label>
+      <textarea id="obs" placeholder="Ex: ponto de entrega, troco, etc."></textarea>
+    </div>
+    <div class="totrow">
+      <span class="lbl">Total do pedido</span>
+      <span class="val" id="total">R$ 0,00</span>
+    </div>
+    <button class="checkout" id="checkout">🛍️ Finalizar pelo WhatsApp</button>
+    <p class="hint" id="hint">O pagamento é combinado com a vendedora pelo WhatsApp 💕</p>
+  </div>
+</aside>
+
+<footer>Blow Girl · Catálogo de revenda</footer>
+
+<script>
+/* ============================================================
+   ⚙️  CONFIGURAÇÃO  —  edite aqui com facilidade
+   ============================================================ */
+
+// 📱 NÚMERO DE WHATSAPP (só números, com 55 + DDD).
+const WHATSAPP = "5581998360659";
+
+// 🏷️ PRODUTOS — para alterar: mude nome, descricao, preco ou foto.
+//    Para ADICIONAR: copie um bloco { ... } e cole na lista.
+//    Para REMOVER: apague o bloco. A "foto" é o nome do arquivo de imagem.
+const PRODUTOS = [
+  {
+    id: "kit-skincare",
+    nome: "Kit Skincare Banho",
+    descricao: "Hidratante corporal beijável + esfoliante corporal + sabonete líquido.",
+    preco: 104.90,
+    foto: "kit-skincare.webp"
+  },
+  {
+    id: "kit-rotina-completa",
+    nome: "Kit Blow Girl Rotina Completa",
+    descricao: "Hidratante corporal + sabonete corporal + sabonete íntimo + perfume.",
+    preco: 129.90,
+    foto: "kit-blow-girl-rotina-completa.webp"
+  },
+  {
+    id: "hidratante-corporal",
+    nome: "Hidratante Corporal",
+    descricao: "Hidratação diária com toque suave e perfume marcante.",
+    preco: 35.90,
+    foto: "hidratante-corporal.webp"
+  },
+  {
+    id: "hidratante-iluminador",
+    nome: "Hidratante Iluminador",
+    descricao: "Hidrata e dá um brilho iluminado à pele.",
+    preco: 39.90,
+    foto: "hidratante-iluminador-corporal.webp"
+  },
+  {
+    id: "esfoliante-corporal",
+    nome: "Esfoliante Corporal",
+    descricao: "Esfoliação suave que renova e deixa a pele macia.",
+    preco: 54.90,
+    foto: "esfoliante-corporal.webp"
+  }
+];
+
+/* ============================================================
+   💻  LÓGICA DO CATÁLOGO  (não precisa mexer daqui pra baixo)
+   ============================================================ */
+const brl = n => n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const byId = Object.fromEntries(PRODUTOS.map(p=>[p.id,p]));
+
+let cart = {};
+try{ cart = JSON.parse(localStorage.getItem('blow_cart')||'{}'); }catch(e){ cart = {}; }
+function saveCart(){ try{ localStorage.setItem('blow_cart',JSON.stringify(cart)); }catch(e){} }
+
+const grid = document.getElementById('grid');
+
+function renderGrid(){
+  grid.innerHTML = PRODUTOS.map(p=>`
+    <article class="card">
+      <div class="photo"><img src="${p.foto}" alt="${p.nome}" loading="lazy"></div>
+      <div class="body">
+        <h3>${p.nome}</h3>
+        <p class="desc">${p.descricao}</p>
+        <span class="price">${brl(p.preco)}</span>
+        <button class="add${cart[p.id]?' in-cart':''}" data-id="${p.id}">
+          ${cart[p.id] ? '✓ No carrinho ('+cart[p.id]+')' : '＋ Adicionar'}
+        </button>
+      </div>
+    </article>`).join('');
+}
+
+function addToCart(id){
+  cart[id] = (cart[id]||0) + 1;
+  saveCart(); renderGrid(); renderCart();
+  const fab = document.getElementById('cartFab');
+  fab.animate([{transform:'translateX(-50%) scale(1)'},{transform:'translateX(-50%) scale(1.1)'},{transform:'translateX(-50%) scale(1)'}],{duration:260});
+}
+
+function totalItems(){ return Object.values(cart).reduce((a,b)=>a+b,0); }
+function totalPrice(){ return Object.entries(cart).reduce((s,[id,q])=>s+(byId[id]?byId[id].preco*q:0),0); }
+
+function renderCart(){
+  const items = document.getElementById('ditems');
+  const entries = Object.entries(cart).filter(([id,q])=>q>0 && byId[id]);
+  const count = totalItems();
+
+  const fab = document.getElementById('cartFab');
+  fab.hidden = count===0;
+  document.getElementById('fabCount').textContent = count;
+  document.getElementById('total').textContent = brl(totalPrice());
+  document.getElementById('checkout').disabled = count===0;
+
+  if(entries.length===0){
+    items.innerHTML = `<div class="empty"><span class="big">🛍️</span>Seu carrinho está vazio.<br>Adicione produtos para continuar 💕</div>`;
+    return;
+  }
+  items.innerHTML = entries.map(([id,q])=>{
+    const p = byId[id];
+    return `<div class="item">
+      <div class="thumb"><img src="${p.foto}" alt="${p.nome}"></div>
+      <div class="info">
+        <div class="nm">${p.nome}</div>
+        <div class="pr">${brl(p.preco*q)}</div>
+      </div>
+      <div class="qty">
+        <button data-dec="${id}" aria-label="Menos">−</button>
+        <span>${q}</span>
+        <button data-inc="${id}" aria-label="Mais">＋</button>
+      </div>
+      <button class="rm" data-rm="${id}" aria-label="Remover">🗑️</button>
+    </div>`;
+  }).join('');
+}
+
+const overlay = document.getElementById('overlay');
+const drawer  = document.getElementById('drawer');
+function openCart(){ overlay.classList.add('open'); drawer.classList.add('open'); }
+function closeCart(){ overlay.classList.remove('open'); drawer.classList.remove('open'); }
+
+document.getElementById('cartFab').addEventListener('click',openCart);
+document.getElementById('closeBtn').addEventListener('click',closeCart);
+overlay.addEventListener('click',closeCart);
+
+grid.addEventListener('click',e=>{
+  const b = e.target.closest('button.add');
+  if(b) addToCart(b.dataset.id);
+});
+
+document.getElementById('ditems').addEventListener('click',e=>{
+  const inc=e.target.closest('[data-inc]'), dec=e.target.closest('[data-dec]'), rm=e.target.closest('[data-rm]');
+  if(inc){ cart[inc.dataset.inc]++; }
+  else if(dec){ const id=dec.dataset.dec; cart[id]--; if(cart[id]<=0) delete cart[id]; }
+  else if(rm){ delete cart[rm.dataset.rm]; }
+  else return;
+  saveCart(); renderGrid(); renderCart();
+});
+
+document.getElementById('checkout').addEventListener('click',()=>{
+  const nome = document.getElementById('nome').value.trim();
+  const pay  = document.querySelector('input[name="pay"]:checked');
+  const obs  = document.getElementById('obs').value.trim();
+  const hint = document.getElementById('hint');
+
+  if(totalItems()===0) return;
+  if(!nome){ hint.textContent='⚠️ Por favor, digite seu nome.'; hint.style.color='var(--pink-ink)'; document.getElementById('nome').focus(); return; }
+  if(!pay){ hint.textContent='⚠️ Escolha uma forma de pagamento.'; hint.style.color='var(--pink-ink)'; return; }
+  hint.textContent='O pagamento é combinado com a vendedora pelo WhatsApp 💕'; hint.style.color='';
+
+  const linhas = Object.entries(cart).filter(([id,q])=>q>0 && byId[id]).map(([id,q])=>{
+    const p = byId[id];
+    return `• ${q}x ${p.nome} — ${brl(p.preco*q)}`;
+  }).join('\n');
+
+  let msg = `🌸 *NOVO PEDIDO — BLOW GIRL* 🌸\n\n`;
+  msg += `👤 *Cliente:* ${nome}\n\n`;
+  msg += `🛒 *Itens do pedido:*\n${linhas}\n\n`;
+  msg += `💰 *Total:* ${brl(totalPrice())}\n`;
+  msg += `💳 *Forma de pagamento:* ${pay.value}\n`;
+  if(obs) msg += `📝 *Observações:* ${obs}\n`;
+  msg += `\nObrigada pela preferência! 💕`;
+
+  const url = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
+  window.open(url,'_blank');
+});
+
+renderGrid();
+renderCart();
+</script>
